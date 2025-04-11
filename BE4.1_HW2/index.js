@@ -48,6 +48,14 @@ async function addNewHotel(newHotelData) {
     let addedHotel = await new hotel(newHotelData).save();
     return { newHotel: addedHotel };
 }
+// function to delete hotel
+async function deleteHotelbyId(hotelId) {
+    const deletedHotel = await hotel.findByIdAndDelete(hotelId);
+    if (! deletedHotel) {
+        return null;
+    }
+    return { deletedHotel: deletedHotel };
+}
 
 // api to get all hotels
 app.get("/hotels", async (req, res) => {
@@ -119,6 +127,19 @@ app.post("/hotels/new", async (req, res) => {
     try {
         let response = await addNewHotel(newHotelData);
         return res.status(201).json(response);
+    } catch(error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+// api to delete hotel
+app.delete("/hotels/delete/:id", async (req, res) => {
+    const hotelId = req.params.id;
+    try {
+        const response = await deleteHotelbyId(hotelId);
+        if (response === null) {
+            return res.status(404).json({ message: "Hotel not found" });
+        }
+        return res.status(200).json(response);
     } catch(error) {
         res.status(500).json({ error: error.message });
     }
